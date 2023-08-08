@@ -236,9 +236,10 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
             controller: _controller,
             itemCount: cc[season][episode].length,
             itemBuilder: (context, index){
-              return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Dismissible(
+              return //Padding(
+                  //padding: const EdgeInsets.all(8.0),
+                  //child: 
+                  Dismissible(
                     key: Key(cc[season][episode][index][0]),
                     direction: DismissDirection.endToStart,
                     background: Container(
@@ -268,9 +269,9 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
                     // titleTextStyle: TextStyle(fontSize: 14),
 
 
-                  )
+                  );
 
-              );
+              //);
             }),
         floatingActionButton: FloatingActionButton(
           onPressed: () {_controller.animateTo(_controller.offset+600, duration: Duration(seconds: 1), curve: Curves.easeInOut,);},
