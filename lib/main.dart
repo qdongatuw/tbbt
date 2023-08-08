@@ -252,13 +252,22 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
                       alignment: Alignment.centerRight,
                       child: Icon(Icons.check, color: Colors.white),
                     ),
-                    child: ListTileWithFavorite(
-                      index: index,
-                      addToFavorites: addToFavorites,
-                      episodeIndex: episode,
-                      seasonIndex: season,
-                      removeFavorites: removeFavorites,
-                      isFavorite: favorites.contains('${cc[season][episode][index][1]}|${cc[season][episode][index][0]}'),
+                    // child: ListTileWithFavorite(
+                    //   index: index,
+                    //   addToFavorites: addToFavorites,
+                    //   episodeIndex: episode,
+                    //   seasonIndex: season,
+                    //   removeFavorites: removeFavorites,
+                    //   isFavorite: favorites.contains('${cc[season][episode][index][1]}|${cc[season][episode][index][0]}'),
+                    //   subtitle: showChinese? Text(cc[season][episode][index][0], ) : const Text(''),
+                    //   title: SelectableText(
+                    //     cc[season][episode][index][1],
+                    //     onTap: () {
+                    //     },
+                    //   ),
+                    // ),
+                    child: ListTile(
+                      
                       subtitle: showChinese? Text(cc[season][episode][index][0], ) : const Text(''),
                       title: SelectableText(
                         cc[season][episode][index][1],
@@ -266,6 +275,7 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
                         },
                       ),
                     ),
+                    
                     // titleTextStyle: TextStyle(fontSize: 14),
 
 
@@ -371,7 +381,7 @@ class _ListTileWithFavoriteState extends State<ListTileWithFavorite> {
     return GestureDetector(
       onHorizontalDragUpdate: (details) {
         setState(() {
-          showButtons = details.delta.dx > 50; // Adjust this threshold as needed
+          showButtons = details.delta.dx > 10; // Adjust this threshold as needed
         });
       },
       child: Card(
