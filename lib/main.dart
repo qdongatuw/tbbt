@@ -129,7 +129,7 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: const Icon(Icons.delete, color: Colors.white),
                     ),
-                    child: Card(child: ListTile(title: Text(group[0], style: GoogleFonts.patrickHand(textStyle: const TextStyle(fontSize: 20))), subtitle: Text(group[1], style: GoogleFonts.maShanZheng(textStyle: const TextStyle(fontSize: 18))),)) ,
+                    child: Card(child: ListTile(title: Text(group[0], style: GoogleFonts.itim(textStyle: const TextStyle(fontSize: 20))), subtitle: Text(group[1], style: GoogleFonts.maShanZheng(textStyle: const TextStyle(fontSize: 18))),)) ,
                   );
                 },
               )
@@ -275,7 +275,7 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
                         cc[season][episode][index][0],
                         onTap: () {
                         },
-                        style: GoogleFonts.patrickHand(textStyle: const TextStyle(fontSize: 20)) 
+                        style: GoogleFonts.itim(textStyle: const TextStyle(fontSize: 20)) 
                       ),
                     ),) ,
                   ),);
