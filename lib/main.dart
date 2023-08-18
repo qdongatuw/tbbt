@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'tbbt.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 
 /// Flutter code sample for [BottomAppBar].
@@ -129,12 +128,12 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: const Icon(Icons.delete, color: Colors.white),
                     ),
-                    child: Card(child: ListTile(title: Text(group[0], style: GoogleFonts.itim(textStyle: const TextStyle(fontSize: 20))), subtitle: Text(group[1], style: GoogleFonts.maShanZheng(textStyle: const TextStyle(fontSize: 18))),)) ,
+                    child: Card(child: ListTile(title: Text(group[0], style:  const TextStyle(fontFamily:'Itim', fontSize: 20)), subtitle: Text(group[1], style: const TextStyle(fontSize: 18)),)) ,
                   );
                 },
               )
 
-          ):  Center(child: Text('Empty', style: GoogleFonts.patrickHand(),),);
+          ):  const Center(child: Text('Empty', style: TextStyle(fontFamily: 'Itim'),),);
         });
   }
 
@@ -166,7 +165,7 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
                       alignment: Alignment.bottomLeft,
                       children: [
                         Image.asset('lib/assets/1.jpg'),
-                        Text('S${index+1}', style: GoogleFonts.fascinateInline(textStyle: const TextStyle(fontSize: 36, color: Colors.white) ), )
+                        Text('S${index+1}', style:  const TextStyle(fontFamily: 'Cursive', fontSize: 36, color: Colors.white) , )
                       ],
                     ),
 
@@ -183,10 +182,11 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
                         ),
                         itemBuilder: (BuildContext context, int subIndex) {
                           return ListTile(
-                            title: Text('Episode ${subIndex+1}', style: GoogleFonts.patrickHand() ,), // Vertical item label
+                            title: Text('Episode ${subIndex+1}', style: const TextStyle(fontFamily: 'Cursive') ,), // Vertical item label
                             onTap: (){setState(() {
                               season = index;
                               episode = subIndex;
+                              _controller.jumpTo(0);
                             });
                             _saveEpisode();
                             },
@@ -216,7 +216,7 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Season ${season+1} - Episode ${episode+1}', style: GoogleFonts.fascinateInline(),),
+          title: Text('Season ${season+1} - Episode ${episode+1}', style: const TextStyle(fontFamily: 'Cursive'),),
           actions: <Widget>[
             ToggleButtons(
               renderBorder: false,
@@ -270,12 +270,12 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
                     ),
 
                     child:Card(child: ListTile(
-                      subtitle: showChinese? Text(cc[season][episode][index][1], style: GoogleFonts.maShanZheng(textStyle: const TextStyle(fontSize: 18)),) : const Text(''),
+                      subtitle: showChinese? Text(cc[season][episode][index][1], style: const TextStyle(fontSize: 18),) : const Text(''),
                       title: SelectableText(
                         cc[season][episode][index][0],
                         onTap: () {
                         },
-                        style: GoogleFonts.itim(textStyle: const TextStyle(fontSize: 20)) 
+                        style:  const TextStyle(fontFamily: 'Itim', fontSize: 20) 
                       ),
                     ),) ,
                   ),);
@@ -303,6 +303,7 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
               }
               episode--;
             });
+            _controller.jumpTo(0);
             _saveEpisode();
           },
           showChapters: showAll,
@@ -318,6 +319,7 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
               season++;
             }
           });
+          _controller.jumpTo(0);
           _saveEpisode();
           },
 
