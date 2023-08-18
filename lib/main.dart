@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'tbbt.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 
 /// Flutter code sample for [BottomAppBar].
@@ -26,11 +27,11 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
   int episode = 0;
   double offset = 0.0;
   List<String> favorites = [];
+  Set<String> favoritesSet = {};
   ScrollController _controller = ScrollController();
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _loadAppState();
     _controller.addListener(() async{
@@ -82,14 +83,16 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
 
   void addToFavorites(String? item1, String? item2) {
     setState(() {
-      favorites.add('$item1|$item2');
+      favoritesSet.add('$item1|$item2');
+      favorites = favoritesSet.toList();
     });
     _saveFavorites();
   }
 
   void removeFavorites(String? item1, String? item2) {
     setState(() {
-      favorites.remove('$item1|$item1');
+      favoritesSet.remove('$item1|$item1');
+      favorites = favoritesSet.toList();
     });
     _saveFavorites();
   }
@@ -101,7 +104,8 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
         context: context,
         builder: (BuildContext context) {
           return favorites.isNotEmpty? Container(
-              height: 1000, // 设置底部弹出面板的高度
+            padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
+              height: 2000, // 设置底部弹出面板的高度
               child: ListView.builder(
                 physics: const BouncingScrollPhysics(),
                 itemCount: favorites.length,
@@ -113,7 +117,8 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
                     direction: DismissDirection.horizontal, // 滑动方向
                     onDismissed: (direction) {
                       setState(() {
-                        favorites.removeAt(index);
+                        favoritesSet.remove(favorites[index]);
+                        favorites = favoritesSet.toList();
                       });
 
                       _saveFavorites();
@@ -121,15 +126,15 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
                     background: Container(
                       color: Colors.red,
                       alignment: Alignment.centerLeft,
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Icon(Icons.delete, color: Colors.white),
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: const Icon(Icons.delete, color: Colors.white),
                     ),
-                    child: ListTile(title: Text(group[0]),subtitle: Text(group[1]),),
+                    child: Card(child: ListTile(title: Text(group[0], style: GoogleFonts.patrickHand(textStyle: const TextStyle(fontSize: 20))), subtitle: Text(group[1], style: GoogleFonts.maShanZheng(textStyle: const TextStyle(fontSize: 18))),)) ,
                   );
                 },
               )
 
-          ): const Center(child: Text('Empty'),);
+          ):  Center(child: Text('Empty', style: GoogleFonts.patrickHand(),),);
         });
   }
 
@@ -140,8 +145,8 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
-        return Container(
-          height: 800, // 设置底部弹出面板的高度
+        return SizedBox(
+          height: 2000, // 设置底部弹出面板的高度
           child:
           // Scrollbar
           //   thumbVisibility: true,
@@ -150,35 +155,35 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
             physics: const BouncingScrollPhysics(),
             scrollDirection: Axis.horizontal,
             itemCount: cc.length,
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             itemBuilder: (context, index) {
               return Container(
                 width: 150, // 设置列表项的宽度
-                margin: EdgeInsets.all(8),
+                margin: const EdgeInsets.all(8),
                 child: Column(
                   children: [
                     Stack(
                       alignment: Alignment.bottomLeft,
                       children: [
                         Image.asset('lib/assets/1.jpg'),
-                        Text('S${index+1}', style: const TextStyle(fontSize: 36, color: Colors.amber), )
+                        Text('S${index+1}', style: GoogleFonts.fascinateInline(textStyle: const TextStyle(fontSize: 36, color: Colors.white) ), )
                       ],
                     ),
 
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Expanded(
 
                       //height: 150, // Height of the vertical ListView
                       child: ListView.separated(
                         physics: const BouncingScrollPhysics(),
                         itemCount: cc[index].length, // Number of vertical items
-                        separatorBuilder: (BuildContext context, int index) => Divider(
+                        separatorBuilder: (BuildContext context, int index) => const Divider(
                           height: 1, // 分割线高度
                           color: Colors.grey, // 分割线颜色
                         ),
                         itemBuilder: (BuildContext context, int subIndex) {
                           return ListTile(
-                            title: Text('Episode ${subIndex+1}', style: TextStyle(fontFamily: 'Comic sans'),), // Vertical item label
+                            title: Text('Episode ${subIndex+1}', style: GoogleFonts.patrickHand() ,), // Vertical item label
                             onTap: (){setState(() {
                               season = index;
                               episode = subIndex;
@@ -211,14 +216,11 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Season ${season+1} - Episode ${episode+1}',),
+          title: Text('Season ${season+1} - Episode ${episode+1}', style: GoogleFonts.fascinateInline(),),
           actions: <Widget>[
             ToggleButtons(
               renderBorder: false,
-              children: <Widget>[
-                Icon(showChinese? Icons.subtitles_off:Icons.subtitles, color: Colors.lightGreen,),
-                Icon(darkTheme? Icons.light_mode: Icons.dark_mode,  color: Colors.lightGreen,),
-              ],
+              
               isSelected: [showChinese, darkTheme],
               onPressed: (index) {
                 if(index == 0){
@@ -228,6 +230,10 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
                   darkMode();
                 }
               },
+              children: <Widget>[
+                Icon(showChinese? Icons.subtitles_off:Icons.subtitles, color: Colors.lightGreen,),
+                Icon(darkTheme? Icons.light_mode: Icons.dark_mode,  color: Colors.lightGreen,),
+              ],
             ),
           ],
         ),
@@ -236,55 +242,47 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
             controller: _controller,
             itemCount: cc[season][episode].length,
             itemBuilder: (context, index){
-              return //Padding(
-                  //padding: const EdgeInsets.all(8.0),
-                  //child: 
+              return 
+              Padding(
+                  padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
+                  child: 
                   Dismissible(
                     key: Key(cc[season][episode][index][0]),
-                    direction: DismissDirection.endToStart,
+                    direction: DismissDirection.horizontal,
+                    confirmDismiss: (direction) async {
+                      addToFavorites(cc[season][episode][index][0], cc[season][episode][index][1]);
+                      return false;
+                    },
+                    // dismissThresholds: const {DismissDirection.endToStart: 0.5}
+
                     background: Container(
-                      color: Colors.red,
+                      padding: const EdgeInsets.fromLTRB(20.0, 0, 0.0, 0),
+                      color: Colors.green,
                       alignment: Alignment.centerLeft,
-                      child: Icon(Icons.delete, color: Colors.white),
+                      child: const Icon(Icons.favorite, color: Colors.red),
                     ),
+
                     secondaryBackground: Container(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 20.0, 0),
                       color: Colors.green,
                       alignment: Alignment.centerRight,
-                      child: Icon(Icons.check, color: Colors.white),
+                      child: const Icon(Icons.favorite, color: Colors.red),
                     ),
-                    // child: ListTileWithFavorite(
-                    //   index: index,
-                    //   addToFavorites: addToFavorites,
-                    //   episodeIndex: episode,
-                    //   seasonIndex: season,
-                    //   removeFavorites: removeFavorites,
-                    //   isFavorite: favorites.contains('${cc[season][episode][index][1]}|${cc[season][episode][index][0]}'),
-                    //   subtitle: showChinese? Text(cc[season][episode][index][0], ) : const Text(''),
-                    //   title: SelectableText(
-                    //     cc[season][episode][index][1],
-                    //     onTap: () {
-                    //     },
-                    //   ),
-                    // ),
-                    child: ListTile(
-                      
-                      subtitle: showChinese? Text(cc[season][episode][index][0], ) : const Text(''),
+
+                    child:Card(child: ListTile(
+                      subtitle: showChinese? Text(cc[season][episode][index][1], style: GoogleFonts.maShanZheng(textStyle: const TextStyle(fontSize: 18)),) : const Text(''),
                       title: SelectableText(
-                        cc[season][episode][index][1],
+                        cc[season][episode][index][0],
                         onTap: () {
                         },
+                        style: GoogleFonts.patrickHand(textStyle: const TextStyle(fontSize: 20)) 
                       ),
-                    ),
-                    
-                    // titleTextStyle: TextStyle(fontSize: 14),
+                    ),) ,
+                  ),);
 
-
-                  );
-
-              //);
             }),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {_controller.animateTo(_controller.offset+600, duration: Duration(seconds: 1), curve: Curves.easeInOut,);},
+          onPressed: () {_controller.animateTo(_controller.offset+600, duration: const Duration(seconds: 1), curve: Curves.easeInOut,);},
           tooltip: 'Auto',
           child: const Icon(Icons.play_arrow),
         ),
@@ -329,91 +327,6 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
   }
 }
 
-class ListTileWithFavorite extends StatefulWidget {
-  final SelectableText title;
-  final Text subtitle;
-  final Function(String?, String?) addToFavorites;
-  final Function(String?, String?) removeFavorites;
-  final bool isFavorite;
-  final int seasonIndex;
-  final int episodeIndex;
-  final int index;
-
-  const ListTileWithFavorite({super.key,
-    required this.title,
-    required this.subtitle,
-    required this.addToFavorites,
-    required this.removeFavorites,
-    required this.isFavorite,
-    required this.seasonIndex,
-    required this.episodeIndex,
-    required this.index,
-  });
-
-  @override
-  _ListTileWithFavoriteState createState() => _ListTileWithFavoriteState();
-}
-
-class _ListTileWithFavoriteState extends State<ListTileWithFavorite> {
-  bool _isFavorite = false;
-  bool showButtons = false;
-  @override
-  void initState() {
-    super.initState();
-    _isFavorite = widget.isFavorite;
-  }
-
-  void _toggleFavorite() {
-    setState(() {
-      _isFavorite = !_isFavorite;
-    });
-
-    if (_isFavorite) {
-      widget.addToFavorites(widget.title.data, widget.subtitle.data);
-    } else {
-      widget.removeFavorites(widget.title.data, widget.subtitle.data);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    return GestureDetector(
-      onHorizontalDragUpdate: (details) {
-        setState(() {
-          showButtons = details.delta.dx > 10; // Adjust this threshold as needed
-        });
-      },
-      child: Card(
-        child: Column(
-          children: [
-            ListTile(
-              title: widget.title,
-            ),
-            if (showButtons)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      // Perform action
-                    },
-                    child: Text('Button 1'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Perform action
-                    },
-                    child: Text('Button 2'),
-                  ),
-                ],
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _DemoBottomAppBar extends StatelessWidget {
   const _DemoBottomAppBar({
