@@ -96,6 +96,15 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
     _saveFavorites();
   }
 
+  void fetchDictionary(BuildContext context, String text){
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context){
+        return Container(
+          child: Text(text),
+        );
+      });
+  }
 
 
   void showFavorite(BuildContext context){
@@ -136,7 +145,6 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
           ):  const Center(child: Text('Empty', style: TextStyle(fontFamily: 'Itim'),),);
         });
   }
-
 
 
 
@@ -273,7 +281,8 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
                       subtitle: showChinese? Text(cc[season][episode][index][1], style: const TextStyle(fontSize: 18),) : const Text(''),
                       title: SelectableText(
                         cc[season][episode][index][0],
-                        onTap: () {
+                        onSelectionChanged: (TextSelection selection, _) {
+                          fetchDictionary(context, selection.toString());
                         },
                         style:  const TextStyle(fontFamily: 'Itim', fontSize: 20) 
                       ),
