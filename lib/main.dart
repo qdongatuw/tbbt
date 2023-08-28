@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'tbbt.dart';
+import 'dictionary.dart';
 
 
 /// Flutter code sample for [BottomAppBar].
@@ -97,11 +98,21 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
   }
 
   void fetchDictionary(BuildContext context, String text){
+    String textLower = text.toLowerCase().trim();
+    String definition = dict[textLower]!['translation']?? "No definition for $textLower.";
+
     showModalBottomSheet<void>(
+      isScrollControlled: true,
       context: context,
       builder: (BuildContext context){
-        return Container(
-          child: Text(text),
+        return Card(
+          
+
+            child: ListTile(
+              title: Text(textLower),
+              subtitle: Text(definition),
+            ),
+
         );
       });
   }
@@ -109,11 +120,12 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
 
   void showFavorite(BuildContext context){
     showModalBottomSheet<void>(
+        isScrollControlled: true,
         context: context,
         builder: (BuildContext context) {
           return favorites.isNotEmpty? Container(
             padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
-              height: 2000, // 设置底部弹出面板的高度
+              height: 800, // 设置底部弹出面板的高度
               child: ListView.builder(
                 physics: const BouncingScrollPhysics(),
                 itemCount: favorites.length,
@@ -150,10 +162,11 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
 
   void showAll(BuildContext context) {
     showModalBottomSheet<void>(
+      isScrollControlled: true,
       context: context,
       builder: (BuildContext context) {
         return SizedBox(
-          height: 2000, // 设置底部弹出面板的高度
+          height: 600, // 设置底部弹出面板的高度
           child:
           // Scrollbar
           //   thumbVisibility: true,
@@ -250,15 +263,16 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
             controller: _controller,
             itemCount: cc[season][episode].length,
             itemBuilder: (context, index){
+              var item = cc[season][episode][index];
               return 
               Padding(
                   padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
                   child: 
                   Dismissible(
-                    key: Key(cc[season][episode][index][0]),
+                    key: Key(item[0]),
                     direction: DismissDirection.horizontal,
                     confirmDismiss: (direction) async {
-                      addToFavorites(cc[season][episode][index][0], cc[season][episode][index][1]);
+                      addToFavorites(item[0], item[1]);
                       return false;
                     },
                     // dismissThresholds: const {DismissDirection.endToStart: 0.5}
@@ -278,11 +292,15 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
                     ),
 
                     child:Card(child: ListTile(
-                      subtitle: showChinese? Text(cc[season][episode][index][1], style: const TextStyle(fontSize: 18),) : const Text(''),
+                      subtitle: showChinese? Text(item[1], style: const TextStyle(fontSize: 18),) : const Text(''),
                       title: SelectableText(
-                        cc[season][episode][index][0],
+                        item[0],
+                        // onTap: () => {},
                         onSelectionChanged: (TextSelection selection, _) {
-                          fetchDictionary(context, selection.toString());
+                          String text = item[0].substring(selection.baseOffset ,selection.extentOffset);
+                          if(text.isNotEmpty){
+                            fetchDictionary(context, text);
+                          }
                         },
                         style:  const TextStyle(fontFamily: 'Itim', fontSize: 20) 
                       ),
