@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'package:path/path.dart';
 import 'tbbt.dart';
-import 'dictionary.dart';
 
 
 /// Flutter code sample for [BottomAppBar].
-
 void main() {
   runApp(const BottomAppBarDemo());
 }
+
 
 class BottomAppBarDemo extends StatefulWidget {
   const BottomAppBarDemo({super.key});
@@ -18,7 +21,7 @@ class BottomAppBarDemo extends StatefulWidget {
 }
 
 class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
-  FloatingActionButtonLocation _fabLocation =
+  final FloatingActionButtonLocation _fabLocation =
       FloatingActionButtonLocation.endDocked;
 
   bool darkTheme = false;
@@ -28,7 +31,7 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
   double offset = 0.0;
   List<String> favorites = [];
   Set<String> favoritesSet = {};
-  ScrollController _controller = ScrollController();
+  final ScrollController _controller = ScrollController();
 
   @override
   void initState() {
@@ -52,6 +55,32 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
       _controller.jumpTo(offset);
     });
   }
+
+  Future<Map<String, dynamic>> _queryData(BuildContext context, String word) async {
+  final documentsDirectory = await getApplicationDocumentsDirectory();
+  final dbPath = join(documentsDirectory.path, 'my_database.db');
+  AssetBundle bundle = DefaultAssetBundle.of(context);
+  final dbFile = File(dbPath);
+  if (!dbFile.existsSync()) {
+    final data = await bundle.load('lib/assets/my_database.db');
+    await dbFile.writeAsBytes(data.buffer.asUint8List());
+  }
+
+  final db = await openDatabase(dbFile.path, readOnly: true);
+
+  final result = await db.rawQuery(
+    'SELECT phonetic, definition, translation FROM dictionary WHERE word = ?',
+    [word],
+  );
+
+  await db.close();
+
+  if (result.isNotEmpty) {
+    return result.first;
+  } else {
+    return {}; // Return an empty map if no results are found
+  }
+}
 
   Future<void> _saveTheme() async{SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setBool('darkTheme', darkTheme);}
@@ -99,24 +128,54 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
 
   void fetchDictionary(BuildContext context, String text){
     String textLower = text.toLowerCase().trim();
-    String definition = dict[textLower]!['translation']?? "No definition for $textLower.";
 
     showModalBottomSheet<void>(
       isScrollControlled: true,
       context: context,
       builder: (BuildContext context){
-        return Card(
-          
-
-            child: ListTile(
-              title: Text(textLower),
-              subtitle: Text(definition),
+        return FutureBuilder(
+          future: _queryData(context, textLower),
+          builder: (context, snapshot) {
+          if(snapshot.hasData){
+            final data = snapshot.data!;
+          if (data.isNotEmpty){
+            return Container(
+              decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(60)),),
+              padding: const EdgeInsets.all(8.0),
+              height:300,
+              child: ListTile(
+                title: Row(children: [Text(textLower, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),), const SizedBox(width: 5,), Text(data['phonetic'], style: const TextStyle(color: Colors.grey),),],),
+                subtitle: Column(
+                  
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 10,),
+                    Text('Definition: \n${data['definition'].replaceAll('\\n', '\n')}'),
+                    const SizedBox(height: 5,),
+                    Text('中文释义: \n${data['translation'].replaceAll('\\n', '\n')}'),
+              ],
             ),
-
+              ),
+              
+            );
+          }
+           else {
+            return const SizedBox(
+              height:300,
+              child: Center(child: Text("Not found."),) );
+          }
+        }
+      else{
+        return const SizedBox(
+              height:300,
+              child: Center(child: Text("Not found."),) );
+      }
+          }
+          
+          
         );
       });
   }
-
 
   void showFavorite(BuildContext context){
     showModalBottomSheet<void>(
@@ -125,7 +184,7 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
         builder: (BuildContext context) {
           return favorites.isNotEmpty? Container(
             padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
-              height: 800, // 设置底部弹出面板的高度
+              height: 600, // 设置底部弹出面板的高度
               child: ListView.builder(
                 physics: const BouncingScrollPhysics(),
                 itemCount: favorites.length,
@@ -154,11 +213,11 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
                 },
               )
 
-          ):  const Center(child: Text('Empty', style: TextStyle(fontFamily: 'Itim'),),);
+          ):  const Center(
+            child: Text('Empty', style: TextStyle(fontFamily: 'Itim'),),
+            );
         });
   }
-
-
 
   void showAll(BuildContext context) {
     showModalBottomSheet<void>(
@@ -295,7 +354,6 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
                       subtitle: showChinese? Text(item[1], style: const TextStyle(fontSize: 18),) : const Text(''),
                       title: SelectableText(
                         item[0],
-                        // onTap: () => {},
                         onSelectionChanged: (TextSelection selection, _) {
                           String text = item[0].substring(selection.baseOffset ,selection.extentOffset);
                           if(text.isNotEmpty){
