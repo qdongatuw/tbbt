@@ -142,11 +142,12 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
             return Container(
               decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(60)),),
               padding: const EdgeInsets.all(8.0),
-              height:300,
+              height:400,
               child: ListTile(
                 title: Row(children: [Text(textLower, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),), const SizedBox(width: 5,), Text(data['phonetic'], style: const TextStyle(color: Colors.grey),),],),
-                subtitle: Column(
-                  
+                subtitle: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10,),
@@ -154,7 +155,7 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
                     const SizedBox(height: 5,),
                     Text('中文释义: \n${data['translation'].replaceAll('\\n', '\n')}'),
               ],
-            ),
+            ),) 
               ),
               
             );
@@ -208,13 +209,28 @@ class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: const Icon(Icons.delete, color: Colors.white),
                     ),
-                    child: Card(child: ListTile(title: Text(group[0], style:  const TextStyle(fontFamily:'Itim', fontSize: 20)), subtitle: Text(group[1], style: const TextStyle(fontSize: 18)),)) ,
+                    child: Card(
+                      child: ListTile(
+                        title:SelectableText(
+                        group[0],
+                        onSelectionChanged: (TextSelection selection, _) {
+                          String text = group[0].substring(selection.baseOffset ,selection.extentOffset);
+                          if(text.isNotEmpty){
+                            fetchDictionary(context, text);
+                          }
+                        },
+                        style:  const TextStyle(fontFamily: 'Itim', fontSize: 20) 
+                      ), 
+                        subtitle: Text(group[1], style: const TextStyle(fontSize: 18)),
+                        )
+                        ) ,
                   );
                 },
               )
 
-          ):  const Center(
-            child: Text('Empty', style: TextStyle(fontFamily: 'Itim'),),
+          ):  const SizedBox(
+            height: 300,
+            child: Center(child: Text('Empty', style: TextStyle(fontFamily: 'Itim'),),) ,
             );
         });
   }
